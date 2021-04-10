@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
+	const variables: Array<string> = [];
+
 	const provider = vscode.languages.registerCompletionItemProvider('Vale', {
 		provideCompletionItems(_document: vscode.TextDocument, _position: vscode.Position) {
-			return [
+			const completions = [
 				// Keywords
 				new vscode.CompletionItem('as', vscode.CompletionItemKind.Keyword),
 				new vscode.CompletionItem('else', vscode.CompletionItemKind.Keyword),
@@ -58,8 +60,36 @@ export function activate(context: vscode.ExtensionContext) {
 				new vscode.CompletionItem('mod', vscode.CompletionItemKind.Method),
 				new vscode.CompletionItem('len', vscode.CompletionItemKind.Method),
 			];
+
+			if (variables.length > 0) {
+				variables.forEach((item, _index) => {
+					completions.push(
+						new vscode.CompletionItem(item, vscode.CompletionItemKind.Variable),
+					);
+				});
+			}
+
+			return completions;
 		}
 	});
 
-	context.subscriptions.push(provider);
+	const varProvider = vscode.languages.registerCompletionItemProvider(
+		'Vale',
+		{
+			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
+				const linePrefix = document.lineAt(position).text.substr(0, position.character);
+				if (linePrefix.endsWith('=')) {
+					var item = linePrefix.replace('=', '').trim();
+					if (!variables.includes(item)) {
+						variables.push(item);
+					}
+				}
+
+				return undefined;
+			}
+		},
+		'='
+	);
+
+	context.subscriptions.push(provider, varProvider);
 }

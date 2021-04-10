@@ -44,9 +44,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.activate = void 0;
 const vscode = __webpack_require__(1);
 function activate(context) {
+    const variables = [];
     const provider = vscode.languages.registerCompletionItemProvider('Vale', {
         provideCompletionItems(_document, _position) {
-            return [
+            const completions = [
                 // Keywords
                 new vscode.CompletionItem('as', vscode.CompletionItemKind.Keyword),
                 new vscode.CompletionItem('else', vscode.CompletionItemKind.Keyword),
@@ -98,9 +99,27 @@ function activate(context) {
                 new vscode.CompletionItem('mod', vscode.CompletionItemKind.Method),
                 new vscode.CompletionItem('len', vscode.CompletionItemKind.Method),
             ];
+            if (variables.length > 0) {
+                variables.forEach((item, _index) => {
+                    completions.push(new vscode.CompletionItem(item, vscode.CompletionItemKind.Variable));
+                });
+            }
+            return completions;
         }
     });
-    context.subscriptions.push(provider);
+    const varProvider = vscode.languages.registerCompletionItemProvider('Vale', {
+        provideCompletionItems(document, position) {
+            const linePrefix = document.lineAt(position).text.substr(0, position.character);
+            if (linePrefix.endsWith('=')) {
+                var item = linePrefix.replace('=', '').trim();
+                if (!variables.includes(item)) {
+                    variables.push(item);
+                }
+            }
+            return undefined;
+        }
+    }, '=');
+    context.subscriptions.push(provider, varProvider);
 }
 exports.activate = activate;
 
