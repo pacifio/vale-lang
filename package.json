@@ -2,11 +2,23 @@
 	"name": "vale-lang",
 	"displayName": "vale-lang",
 	"description": "Vale language syntax highlighting and basic auto-completetion",
-	"version": "0.0.1",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/pacifio/vale-lang"
+	},
+	"author": {
+		"name": "Adib Mohsin",
+		"email": "adibmohsin.root@gmail.com",
+		"url": "https://github.com/pacifio"
+	},
+	"publisher": "pacifio",
+	"icon": "icon/vale.png",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.55.0"
 	},
 	"categories": [
+		"Programming Languages",
 		"Other"
 	],
 	"activationEvents": [
